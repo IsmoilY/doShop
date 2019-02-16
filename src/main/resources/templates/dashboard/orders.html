@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{dashboard/core}">
+
+<th:block layout:fragment="styles">
+    <link rel="stylesheet" href="/assets/css/dropify.min.css">
+</th:block>
+
+<div layout:fragment="page_content">
+    <div class="container">
+        <div class="row" id="products">
+
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+    <!--js files-->
+    <script src="/assets/js/dropify.min.js"></script>
+    <script src="/assets/js/form-validator/jquery.form-validator.min.js"></script>
+    <script type="text/javascript">
+
+        $.validate({
+            form : '#img-form',
+            errorMessageClass:'text-danger',
+        });
+
+        $('#img-form').submit(function (e) {
+            $.ajax({
+                type: "POST",
+                url: "/product/save",
+                data: new FormData(this),
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert(response.message);
+                    $('#p_name').val('');
+                    $('#p_description').val('');
+                    $('#p_price').val('');
+                },
+                error: function (reason) {
+                    alert(reason.message);
+                }
+            });
+            e.preventDefault();
+        });
+
+        var getProducts = function() {
+            $.ajax({
+                type: "POST",
+                url: "/product/list",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({}),
+                success: function (response) {
+                    $("#products").empty();
+                    $.each(response.data, function (index, value) {
+                        var valueId = value.id;
+                        var product = '<div class="col-lg-4 col-md-4">' +
+                            '<div class="card">' +
+                            '<div class="card-body" id="images">' +
+                            '<div class="card">' +
+                            '<img class="card-img-top" height="250" width="50%" src="/image/' + value.image.id +'" alt="Card image cap">' +
+                            '<div class="card-body">' +
+                            '<h4 class="card-title">' + value.name + '</h4>' +
+                            '<p class="card-text">' + value.description + '</p>' +
+                            '<a href="#" class="btn btn-primary">EDIT</a>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>'
+                        $("#products").append(product);
+                    });
+                },
+                error: function (response) {
+                    alert("Ajaxda error bo`ldi");
+                }
+            });
+        };
+        $(document).ready(function () {
+            getProducts();
+        });
+    </script>
+    <script>
+        $(function() {
+            // Basic
+            $('.dropify').dropify();
+
+            // Translated
+            $('.dropify-fr').dropify({
+                messages: {
+                    default: 'Glissez-déposez un fichier ici ou cliquez',
+                    replace: 'Glissez-déposez un fichier ou cliquez pour remplacer',
+                    remove: 'Supprimer',
+                    error: 'Désolé, le fichier trop volumineux'
+                }
+            });
+
+            // Used events
+            var drEvent = $('#input-file-events').dropify();
+
+            drEvent.on('dropify.beforeClear', function(event, element) {
+                return confirm("Do you really want to delete \"" + element.file.name + "\" ?");
+            });
+
+            drEvent.on('dropify.afterClear', function(event, element) {
+                alert('File deleted');
+            });
+
+            drEvent.on('dropify.errors', function(event, element) {
+                console.log('Has Errors');
+            });
+
+            var drDestroy = $('#input-file-to-destroy').dropify();
+            drDestroy = drDestroy.data('dropify')
+            $('#toggleDropify').on('click', function(e) {
+                e.preventDefault();
+                if (drDestroy.isDropified()) {
+                    drDestroy.destroy();
+                } else {
+                    drDestroy.init();
+                }
+            })
+        });
+    </script>
+</th:block>
+</html>

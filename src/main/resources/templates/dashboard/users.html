@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{dashboard/core}">
+<th:block layout:fragment="styles">
+    <!--css links-->
+    <link rel="stylesheet" href="/assets/css/all.css">
+
+</th:block>
+
+<div layout:fragment="page_content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <button class="btn btn-sm btn-outline-secondary">Share</button>
+                <button class="btn btn-sm btn-outline-secondary">Export</button>
+            </div>
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <span data-feather="calendar"></span>
+                This week
+            </button>
+        </div>
+    </div>
+
+    <h2>Section title</h2>
+    <div class="table-responsive">
+        <table class="table table-active table-bordered">
+            <thead>
+            <tr>
+                <td style="width: 15%">#id</td>
+                <td style="width: 20%">username</td>
+                <td style="width: 25%">email</td>
+                <td style="width: 25%">fullname</td>
+                <td style="width: 15%">action</td>
+            </tr>
+            </thead>
+            <tbody id="users"></tbody>
+        </table>
+    </div>
+</div>
+<th:block layout:fragment="scripts">
+    <script src="/assets/js/all.js"></script>
+
+    <script type="text/javascript">
+        var getUsers = function(){
+            $.ajax({
+                type: "POST",
+                url: "/cabinet/list",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({}),
+                success: function (response) {
+                    $("#users").empty();
+                    $.each(response.data, function (index, value) {
+                        var valueId = value.id;
+                        var trHtml = '<tr>' +
+                            '<td style="width: 15%">' + value.id + '</td>' +
+                            '<td style="width: 20%">' + value.username+ '</td>' +
+                            '<td style="width: 25%">' + value.email+ '</td>' +
+                            '<td style="width: 25%">' + value.fullName + '</td>' +
+                            '<td style="width: 15%">' + '<a href="/user/settings/' +value.id + '"><span class="fa fa-cog"></span></a>' + '</td>' +
+                            '</tr>';
+                        $("#users").append(trHtml);
+                    });
+                },
+                error: function (response) {
+                    alert("Ajaxda error bo`ldi");
+                }
+            });
+        };
+        $(document).ready(function () {
+            getUsers();
+        })
+    </script>
+</th:block>
+
+</html>

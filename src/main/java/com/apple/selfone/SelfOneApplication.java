@@ -1,0 +1,14 @@
+package com.apple.selfone;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SelfOneApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SelfOneApplication.class, args);
+    }
+
+}
+
